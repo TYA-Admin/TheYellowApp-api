@@ -13,5 +13,6 @@ router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
 router.post('/change-password', authMiddleware, userController.changePassword);
 router.post('/validate-user', authMiddleware, userController.validateUserWithToken);
+router.post('/upload-profile-picture', authMiddleware, upload.single('profilePicture'), userController.uploadProfilePicture);
 
 module.exports = router;

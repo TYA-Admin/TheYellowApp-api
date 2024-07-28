@@ -11,15 +11,7 @@ const login = async ({ email, password }) => {
   const user = await userService.getUserByEmail(email);
 
   if (!user) {
-    throw new Error('User is not found');
-  }
-
-  if (!user.password) {
-    throw new Error('Invalid email or password. Password is null.');
-  }
-
-  if (!user.isActive) {
-    throw new Error('User is not active');
+    throw new Error('User not found');
   }
 
   const passwordMatch = await bcrypt.compare(password, user.password);
@@ -28,14 +20,14 @@ const login = async ({ email, password }) => {
     throw new Error('Invalid email or password');
   }
 
-  const token = jwtHelper.signJwt({ id: user.id, email: email, role: user.role });
+  const token = jwtHelper.signJwt({ user_id: user.user_id, email: email, role: user.role });
 
   return {
     message: 'Login successful',
     email: email,
     name: user.name,
-    userId: user.id,
-    profilePictureUrl: user.profile_picture_url,
+    userId: user.user_id,
+    profilePictureUrl: user.profile_pic,
     token: token
   };
 };
@@ -86,7 +78,7 @@ const validateUserWithToken = async (token) => {
   return {
     message: 'User validated successfully',
     email: userEmail,
-    userId: user.id,
+    userId: user.user_id,
     name: user.name,
     role: user.role,
     token: token

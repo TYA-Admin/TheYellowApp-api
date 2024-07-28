@@ -1,6 +1,7 @@
 const userService = require('../services/userService');
 const authService = require('../services/authService');
 const otpService = require('../services/otpService');
+const { uploadFileToS3 } = require('../helpers/uploader');
 
 async function register(req, res) {
   try {
@@ -62,11 +63,44 @@ async function validateUserWithToken(req, res) {
   }
 }
 
+async function uploadProfilePicture(req, res) {
+  const userId = req.params.userId;
+
+  try {
+    const user = await userService.getUserByID(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const uploadResponse = await uploadFileToS3(file, 'profiles', `profile-${userId}`);
+
+    const profilePictureUrl = uploadResponse.location;
+
+    const updatedProfile = await userService.updateProfilePicture(userId, profilePictureUrl);
+
+    return res.json({
+      success: true,
+      message: 'Profile picture uploaded successfully',
+      profile: updatedProfile
+    });
+  } catch (error) {
+    console.error('Error uploading profile picture:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
 module.exports = {
   register,
   login,
   forgotPassword,
   resetPassword,
   changePassword,
-  validateUserWithToken
+  validateUserWithToken,
+  uploadProfilePicture
 };
