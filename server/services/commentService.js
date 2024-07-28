@@ -2,15 +2,14 @@ const databaseHelper = require('../helpers/database');
 
 const addComment = async ({ userId, intermissionId, value, parentId }) => {
   const sql = `
-      INSERT INTO comments (user_id, intermission_id, value, parent_id, created_by)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO comments (created_by, qrcode_id, value, parent_comment_id)
+      VALUES (?, ?, ?, ?)
   `;
   const params = [
     userId,
     intermissionId,
     value,
-    parentId || null,
-    'api'
+    parentId || null
   ];
 
   try {
@@ -25,7 +24,7 @@ const addComment = async ({ userId, intermissionId, value, parentId }) => {
 };
 
 const getCommentsByIntermission = async (intermissionId) => {
-  const sql = 'SELECT * FROM comments WHERE intermission_id = ?';
+  const sql = 'SELECT * FROM comments WHERE qrcode_id = ?';
 
   try {
     return await databaseHelper.query(sql, [intermissionId]);
@@ -36,7 +35,7 @@ const getCommentsByIntermission = async (intermissionId) => {
 };
 
 const addLike = async (commentId) => {
-  const sql = 'UPDATE comments SET likes = likes + 1 WHERE id = ?';
+  const sql = 'UPDATE comments SET likes = likes + 1 WHERE comment_id = ?';
 
   try {
     const result = await databaseHelper.query(sql, [commentId]);
@@ -53,7 +52,7 @@ const addLike = async (commentId) => {
 };
 
 const getCommentById = async (commentId) => {
-  const sql = 'SELECT * FROM comments WHERE id = ?';
+  const sql = 'SELECT * FROM comments WHERE comment_id = ?';
 
   try {
     const result = await databaseHelper.query(sql, [commentId]);
@@ -66,7 +65,7 @@ const getCommentById = async (commentId) => {
 };
 
 const getLikeByCommentId = async (commentId) => {
-  const sql = 'SELECT likes FROM comments WHERE id = ?';
+  const sql = 'SELECT likes FROM comments WHERE comment_id = ?';
 
   try {
     const result = await databaseHelper.query(sql, [commentId]);
