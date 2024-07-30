@@ -93,7 +93,7 @@ const getStickers = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const stickers = await bookService.getStickersByChapterId(chapterId);
+    const stickers = await bookService.getStickersById(chapterId);
     return res.status(200).json({ stickers });
   } catch (error) {
     console.error('Error fetching stickers:', error);
@@ -115,7 +115,7 @@ const getVideo = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const video = await bookService.getVideoByChapterId(chapterId);
+    const video = await bookService.getVideoById(chapterId);
     if (!video) {
       return res.status(404).json({ message: 'Video not found' });
     }
