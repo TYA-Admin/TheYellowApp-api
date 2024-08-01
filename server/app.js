@@ -35,6 +35,8 @@ app.get('/health', (req, res) => {
 });
 app.all('/*', allowCORS);
 app.use('/v1/api/user', require('./routes/userRoute'));
+app.use('/v1/api/book', require('./routes/bookRoute'));
+app.use('/v1/api/comment', require('./routes/commentRoutes'));
 
 // API Routes
 app.all('/*', get404);
