@@ -17,7 +17,7 @@ config.database = {
     user: process.env.DATABASE_USER,
     password: process.env.DATABASE_PASS,
     database: process.env.DATABASE_DB,
-    //If we reach connection limit, put the conection in a queue and wait for 10 seconds
+    //If we reach connection limit, put the connection in a queue and wait for 10 seconds
     waitForConnections: true,
     multipleStatements: true,
     debug: false,

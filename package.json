@@ -1,5 +1,5 @@
 {
-  "name": "greatnight-api",
+  "name": "TheYellowApp-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://troynunnally: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@github.com/brainrainsolutions/greatnight-api.git"
+    "url": "git+https://github.com/TYA-Admin/TheYellowApp-api.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/brainrainsolutions/greatnight-api/issues"
+    "url": "https://github.com/TYA-Admin/TheYellowApp-api/issues"
   },
-  "homepage": "https://github.com/brainrainsolutions/greatnight-api#readme",
+  "homepage": "https://github.com/TYA-Admin/TheYellowApp-api#readme",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.535.0",
     "axios": "^1.6.8",
