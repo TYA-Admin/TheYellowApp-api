@@ -13,5 +13,6 @@ router.get('/getChapter', authMiddleware, bookController.getChapter);
 router.get('/getIntermission', authMiddleware, bookController.getIntermission);
 router.get('/getStickers', authMiddleware, bookController.getStickers);
 router.get('/getVideo', authMiddleware, bookController.getVideo);
+router.get('/content/:type/:id')
 
 module.exports = router;
