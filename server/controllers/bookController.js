@@ -1,26 +1,106 @@
 const userService = require('../services/userService');
 const bookService = require('../services/bookService');
+const jwtHelper = require('../helpers/jwt')
 
-const getBookByQRCode = async (req, res) => {
-  const { userId } = req.params;
-  const { bookId } = req.body;
+const createLock = async (req, res) => {
+  const { bookId, deviceId} = req.body
 
+  if (!bookId || !deviceId) {
+    return res.status(400).json({ message: 'Invalid Request.' });
+  }
+
+  try {
+    const doesLockExist = await bookService.getLockId(bookId, deviceId)
+
+    if (doesLockExist.length !== 0) {
+      return res.status(201).json({ 
+        data: {
+          lockId: doesLockExist[0].open_book_id
+        }, 
+        message: null
+      })
+    }
+
+    const lock = await bookService.insertLock(bookId, deviceId)
+    console.log(lock)
+    return res.json(
+      { 
+        data: {
+          lockId: lock.insertId
+        }, 
+        message: null
+      })
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ message: 'Server error' })
+  }
+}
+
+//Inside of getBook, we are creating and validating the Key
+const getBook = async (req, res) => {
+  const { bookId, deviceId } = req.body;
+  const userToken = req.headers["authorization"].split(' ')[1]
+  const userId = jwtHelper.decodeJwt(userToken)
+  
   if (!bookId) {
     return res.status(400).json({ message: 'Book ID is required' });
   }
 
   try {
-    const user = await userService.getUserByID(userId);
-    if (!user) {
+    const lock = await bookService.getLockId(bookId, deviceId)
+
+    if (lock.length !== 1) {
+      return res.status(404).send({ message: 'Invalid lock' })
+    }
+
+    const user = await userService.getUserByID(userId.user_id);
+    
+    if (user.length === 0) {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    if (lock[0].user_id === null || lock[0].user_id !== userId.user_id) {
+      await bookService.addKey(bookId, deviceId, userId.user_id)
+    }
+
     const book = await bookService.getBookById(bookId);
+    
     if (!book) {
       return res.status(404).json({ message: 'Book not found' });
     }
 
-    return res.status(200).json({ book });
+    const response = {
+      book_id: bookId,
+      uuid: book.uuid,
+      name: book.name,
+      author: book.author,
+      content: []
+    }
+
+    const videos = await bookService.getVideos(bookId)
+    const stickers = await bookService.getStickers(bookId)
+    const comments = await bookService.getComments(bookId)
+
+    response.content = [...videos, ...stickers, ...comments];
+
+    response.content.sort((a, b) => a.sequence - b.sequence);
+
+    for (let i = 0; i < response.content.length; i++) {
+      const access = await bookService.contentAccess(response.content[i].qrcode_id, deviceId, userId.user_id)
+
+      if (access.length > 0) {
+        response.content[i] = { ...response.content[i], access: true }
+      } else {
+        response.content[i] = { ...response.content[i], access: false }
+      }
+    }
+
+    response.content = response.content.map(item => {
+      const { created_at, created_by, updated_at, updated_by, ...rest } = item;
+      return rest;
+    });
+
+    return res.status(200).json(response);
   } catch (error) {
     console.error('Error fetching book:', error);
     return res.status(500).json({ message: 'Server error' });
@@ -128,9 +208,10 @@ const getVideo = async (req, res) => {
 };
 
 module.exports = {
-  getBookByQRCode,
+  getBook,
   getChapter,
   getIntermission,
   getStickers,
-  getVideo
+  getVideo,
+  createLock
 };

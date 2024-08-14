@@ -11,24 +11,37 @@ const login = async ({ email, password }) => {
   const user = await userService.getUserByEmail(email);
 
   if (!user) {
-    throw new Error('User not found');
+    return {
+      statusCode: 404,
+      data: {
+        message: 'Invalid username or password.'
+      }
+    }
   }
 
   const passwordMatch = await bcrypt.compare(password, user.password);
 
   if (!passwordMatch) {
-    throw new Error('Invalid email or password');
+    return {
+      statusCode: 404,
+      data: {
+        message: 'Invalid username or password.'
+      }
+    }
   }
 
   const token = jwtHelper.signJwt({ user_id: user.user_id, email: email, role: user.role });
 
   return {
-    message: 'Login successful',
-    email: email,
-    name: user.name,
-    userId: user.user_id,
-    profilePictureUrl: user.profile_pic,
-    token: token
+    statusCode: 200,
+    data: {
+      message: 'Login successful',
+      email: email,
+      name: user.name,
+      userId: user.user_id,
+      profilePictureUrl: user.profile_pic,
+      token: token
+    }
   };
 };
 
@@ -48,17 +61,34 @@ const changePassword = async ({ email, currentPassword, newPassword }) => {
   const user = await userService.getUserByEmail(email);
 
   if (!user) {
-    throw new Error('User not found');
+    return {
+      statusCode: 404,
+      data: {
+        message: 'User does not exist.'
+      }
+    }
   }
 
   const passwordMatch = await bcrypt.compare(currentPassword, user.password);
 
   if (!passwordMatch) {
-    throw new Error('Incorrect old password');
+    return {
+      statusCode: 500,
+      data: {
+        message: 'Current password is invalid.'
+      }
+    }
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   await userService.updateUserPassword(email, hashedPassword);
+
+  return {
+    statusCode: 200,
+    data: {
+      message: 'Password successfully updated.'
+    }
+  }
 };
 
 const validateUserWithToken = async (token) => {

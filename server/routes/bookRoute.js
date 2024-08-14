@@ -7,7 +7,8 @@ const authMiddleware = require('../helpers/middleware/authMiddleware');
 const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
 
-router.post('/getBookByQRCode', authMiddleware, bookController.getBookByQRCode);
+router.post('/createLock', bookController.createLock)
+router.post('/getBook', authMiddleware, bookController.getBook);
 router.get('/getChapter', authMiddleware, bookController.getChapter);
 router.get('/getIntermission', authMiddleware, bookController.getIntermission);
 router.get('/getStickers', authMiddleware, bookController.getStickers);

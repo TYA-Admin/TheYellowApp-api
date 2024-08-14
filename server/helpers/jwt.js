@@ -43,6 +43,14 @@ const verifyJwt = (token) => {
   }
 };
 
+const decodeJwt = (token) => {
+  const decodedToken = jwt.decode(token)
+
+  return decodedToken
+}
+
 module.exports = {
-  signJwt, verifyJwt
+  signJwt, 
+  verifyJwt,
+  decodeJwt
 };

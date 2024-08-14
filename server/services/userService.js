@@ -28,7 +28,12 @@ const register = async (data) => {
   const existingUser = await getUserByEmail(email);
 
   if (existingUser) {
-    throw new Error('User already exists');
+    return {
+      data: {
+        message: 'User already exists!'
+      },
+      statusCode: 201
+    }
   }
 
   // Hash the password
@@ -44,11 +49,14 @@ const register = async (data) => {
   const token = jwtHelper.signJwt({ id: user.user_id, email: email });
 
   return {
-    message: 'User registered successfully',
-    email: user.email,
-    userId: user.user_id,
-    name: user.name,
-    token: token
+    statusCode: 200,
+    data: {
+      message: 'User registered successfully',
+      email: user.email,
+      userId: user.user_id,
+      name: user.name,
+      token: token
+    }
   };
 };
 

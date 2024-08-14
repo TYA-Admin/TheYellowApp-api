@@ -7,7 +7,7 @@ const authMiddleware = require('../helpers/middleware/authMiddleware');
 const storage = multer.memoryStorage();
 const upload = multer({storage: storage});
 
-router.post('/register', upload.any(), userController.register);
+router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.post('/forgot-password', userController.forgotPassword);
 router.post('/reset-password', userController.resetPassword);
